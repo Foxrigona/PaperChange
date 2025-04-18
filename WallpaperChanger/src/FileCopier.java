@@ -1,0 +1,91 @@
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Scanner;
+
+import javax.imageio.stream.FileImageInputStream;
+import javax.imageio.stream.FileImageOutputStream;
+
+/**
+ * This is a class that can be used to copy files from a specified destination into a target destination with a target name
+ */
+public class FileCopier {
+	
+	/**
+	 * The output directory to the folder the image will be copied to
+	 */
+	private String outputLocation;
+	
+	/**
+	 * Creates an instance of the FileCopier class with a specified output Location
+	 * @param outputLocation The directory you want the copy of the image to be saved to
+	 */
+	public FileCopier(String outputLocation) {
+		this.outputLocation = outputLocation;
+	}
+	
+	/**
+	 * returns the output directory
+	 * @return output directory
+	 */
+	public String getOutputLocation() {
+		return outputLocation;
+	}
+
+	/**
+	 * Sets the output location of the image copy
+	 * @param outputLocation New output location of the image copy
+	 */
+	public void setOutputLocation(String outputLocation) {
+		this.outputLocation = outputLocation;
+	}
+	
+	/**
+	 * Duplicates the file from the input directory to the output directory under a new name
+	 * @param inputLocation Input directory where the image can be found
+	 * @param outputName Name of the copied file
+	 * @throws IOException if the input directory does not exist
+	 */
+	public void duplicateFile(String inputLocation, String outputName) throws IOException {
+		FileInputStream inp = null;
+		FileOutputStream oup = null;
+		inp = new FileInputStream(inputLocation);
+		oup = new FileOutputStream(this.outputLocation + "\\" + outputName + ".jpg");
+		
+		BufferedInputStream inputImage = new BufferedInputStream(inp);
+		BufferedOutputStream outputImage = new BufferedOutputStream(oup);
+		
+		int outputByte = 0;
+		while(outputByte != -1) {
+			outputByte =  inputImage.read();
+			outputImage.write(outputByte);
+		}
+		
+		inputImage.close();
+		outputImage.close();
+		
+	}
+	
+	public static void main(String[] args) {
+		//Instantiates a file copier object that copies an image to the output location
+		FileCopier fc = new FileCopier("C:\\Users\\ethan\\Documents\\Wallpapers");
+		
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Please input the file location of the file you want to copy: ");
+		String outputLocation = sc.nextLine();
+
+		System.out.println("Please input the new name of the file: ");
+		String outputName = sc.nextLine();
+		
+		try {
+			fc.duplicateFile(outputLocation, outputName);
+		} catch (IOException e) {
+			return;
+		}
+		
+		System.out.println("COMPLETE");
+		
+	}
+}
