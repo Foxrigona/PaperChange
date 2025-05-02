@@ -1,8 +1,10 @@
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.*;
 import java.util.Scanner;
 
 import javax.imageio.stream.FileImageInputStream;
@@ -48,7 +50,7 @@ public class FileCopier {
 	 * @param outputName Name of the copied file
 	 * @throws IOException if the input directory does not exist
 	 */
-	public void duplicateFile(String inputLocation, String outputName) throws IOException {
+	public void duplicateImage(String inputLocation, String outputName) throws IOException {
 		FileInputStream inp = null;
 		FileOutputStream oup = null;
 		inp = new FileInputStream(inputLocation);
@@ -66,26 +68,41 @@ public class FileCopier {
 		inputImage.close();
 		outputImage.close();
 		
+		try {
+			addImageToDatabase(outputName);
+		} catch (SQLException e) {
+			System.out.println("Databaase Problem");
+		}
+	}
+	
+	/**
+	 * This method adds the name of the image to the image database
+	 * @param name The name of the method to be added to the database
+	 * @throws SQLException if the database or table doess not exist
+	 */
+	public void addImageToDatabase(String name) throws SQLException {
+		Connection connection = DatabaseConnector.getConnection();
+		Statement stmt = connection.createStatement();
+		stmt.execute("INSERT INTO images (ImageName) VALUES (\""+ name + "\")");
 	}
 	
 	public static void main(String[] args) {
 		//Instantiates a file copier object that copies an image to the output location
-		FileCopier fc = new FileCopier("C:\\Users\\ethan\\Documents\\Wallpapers");
+		FileCopier fc = new FileCopier("src/Wallpapers");
 		
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Please input the file location of the file you want to copy: ");
+
+		Scanner sc = new Scanner(System.in); System.out.
+		println("Please input the file location of the file you want to copy: ");
 		String outputLocation = sc.nextLine();
 
-		System.out.println("Please input the new name of the file: ");
-		String outputName = sc.nextLine();
-		
-		try {
-			fc.duplicateFile(outputLocation, outputName);
-		} catch (IOException e) {
-			return;
-		}
-		
+		System.out.println("Please input the new name of the file: "); String
+		outputName = sc.nextLine();
+
+		try { fc.duplicateImage(outputLocation, outputName); } 
+		catch (IOException e) { return; }
+
 		System.out.println("COMPLETE");
+		 
 		
 	}
 }
