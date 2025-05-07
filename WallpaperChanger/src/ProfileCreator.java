@@ -1,12 +1,22 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
+
+import javax.xml.crypto.Data;
 
 /**
  * This utility class is used to create profiles that link image wallpapers together and allow you to switch between them.
  */
 public final class ProfileCreator {
+	//The active profile
+	private static int activeProfile;
+	
 	private ProfileCreator() {
 		
 	}
@@ -37,12 +47,80 @@ public final class ProfileCreator {
 		stmt.execute("INSERT INTO imgprofiles (ProfileName, ImageID1, ImageID2) VALUES ('"+ profileName + "', '"+ imageID1 + "', '"+ imageID2 + "')");
 	}
 	
-	public static void main(String[] args) {
+	/**
+	 * Sets the active profile that will persist through all sessions of the program
+	 * @param profileID The active wallpaper profile ID
+	 * @param wallpaperID The active wallpaper ID
+	 */
+	public static void setActiveProfile(int profileID, int wallpaperID) {
+		//Creates an instance of the properties
+		Properties active = new Properties();
 		try {
-			ProfileCreator.MakeProfile("ArcaneCharacters", "Jinx", "Singed");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//Creates a link to the properties file to be outputted to
+			FileOutputStream file = new FileOutputStream("activeProfile.properties");
+			
+			//Sets the active profile and wallpaper ID to the properties file
+			active.setProperty("activeProfileID", Integer.toString(profileID));
+			active.setProperty("activeWallpaperID", Integer.toString(wallpaperID));
+			
+			//Actually stores the properties in the property file
+			active.store(file, null);
+		} catch (IOException e) {
+			System.out.println("There has been a problem connecting to the properties file");
+			return;
 		}
+	}
+	
+	/**
+	 * Returns the active profile ID of the profile being used
+	 * @return The active profile ID of the most recent profile
+	 */
+	public static int getActiveProfileID() {
+		//Creates property instance in order to read from property file
+		Properties active = new Properties();
+		try {
+			//Creates link to the actual properties file
+			FileInputStream stream = new FileInputStream("activeProfile.properties");
+			
+			//Loads the property file into the properties instance
+			active.load(stream);			
+			
+			//Returns active profile ID
+			return Integer.parseInt(active.getProperty("activeProfileID"));
+		} catch (IOException e) {
+			System.out.println("property file could not be found");
+			return -1;
+		}
+	}
+	
+	/**
+	 * Returns the ID of the wallpaper most recently used
+	 * @return The ID of the wallpaper most recently used
+	 */
+	public static int getActiveWallpaperID() {
+		//Creates property instance in order to read from property file
+		Properties active = new Properties();
+		try {
+			//Creates link to the actual properties file
+			FileInputStream stream = new FileInputStream("activeProfile.properties");
+			
+			//Loads the property file into the properties instance
+			active.load(stream);			
+			
+			//Returns active wallpaper ID
+			return Integer.parseInt(active.getProperty("activeWallpaperID"));
+		} catch (IOException e) {
+			System.out.println("property file could not be found");
+			return -1;
+		}
+	}
+	
+	public static int getProfileID(String profileName) {
+		Connection c = DatabaseConnector.getConnection();
+		return 1;
+	}
+	
+	public static void main(String[] args) {
+		ProfileCreator.setActiveProfile(1, 3);
 	}
 }
