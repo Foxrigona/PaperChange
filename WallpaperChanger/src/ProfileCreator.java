@@ -54,6 +54,7 @@ public final class ProfileCreator {
 		//Creates an instance of the properties
 		Properties active = new Properties();
 		try {
+			if(!wallpaperIsInProfile(profileID, wallpaperID)) return;
 			//Creates a link to the properties file to be outputted to
 			FileOutputStream file = new FileOutputStream("activeProfile.properties");
 			
@@ -113,6 +114,24 @@ public final class ProfileCreator {
 		}
 	}
 	
+	public static boolean wallpaperIsInProfile(int profileID, int wallpaperID) {
+		Connection connection = DatabaseConnector.getConnection();
+		
+		try {
+			Statement statement = connection.createStatement();
+			
+			String query = String.format("SELECT ProfileID FROM imgprofiles WHERE ImageID1 = %1$d OR ImageID2 = %1$d", wallpaperID);
+			ResultSet result = statement.executeQuery(query);
+			
+			while(result.next()) {
+				if(result.getInt("ProfileID") == profileID) return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	/**
 	 * Return the ID of the profile given the name
 	 * @param profileName The name of the profile
@@ -127,7 +146,7 @@ public final class ProfileCreator {
 			Statement request = c.createStatement();
 			
 			//Queries the database for the ID of the profile with the given name and stores it in a result set
-			String query = String.format("SELECT ProfileID FROM imgprofiles WHERE ProfileName = '%s'", profileName);			
+			String query = String.format("SELECT ProfileID FROM imgprofiles WHERE ProfileName = '%s'", profileName);	
 			ResultSet result = request.executeQuery(query);	
 			
 			//Returns the profile ID
@@ -140,6 +159,6 @@ public final class ProfileCreator {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(ProfileCreator.getProfileID("ArcanCharacters"));
+		setActiveProfile(4, 4);
 	}
 }

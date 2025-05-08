@@ -18,21 +18,13 @@ public class FileCopier {
 	/**
 	 * The output directory to the folder the image will be copied to
 	 */
-	private String outputLocation;
-	
-	/**
-	 * Creates an instance of the FileCopier class with a specified output Location
-	 * @param outputLocation The directory you want the copy of the image to be saved to
-	 */
-	public FileCopier(String outputLocation) {
-		this.outputLocation = outputLocation;
-	}
+	private static String outputLocation = "src/Wallpapers";
 	
 	/**
 	 * returns the output directory
 	 * @return output directory
 	 */
-	public String getOutputLocation() {
+	public static String getOutputLocation() {
 		return outputLocation;
 	}
 
@@ -40,8 +32,8 @@ public class FileCopier {
 	 * Sets the output location of the image copy
 	 * @param outputLocation New output location of the image copy
 	 */
-	public void setOutputLocation(String outputLocation) {
-		this.outputLocation = outputLocation;
+	public static void setOutputLocation(String outputLocation) {
+		outputLocation = outputLocation;
 	}
 	
 	/**
@@ -50,11 +42,11 @@ public class FileCopier {
 	 * @param outputName Name of the copied file
 	 * @throws IOException if the input directory does not exist
 	 */
-	public void duplicateImage(String inputLocation, String outputName) throws IOException {
+	public static void duplicateImage(String inputLocation, String outputName) throws IOException {
 		FileInputStream inp = null;
 		FileOutputStream oup = null;
 		inp = new FileInputStream(inputLocation);
-		oup = new FileOutputStream(this.outputLocation + "\\" + outputName + ".jpg");
+		oup = new FileOutputStream(outputLocation + "\\" + outputName + ".jpg");
 		
 		BufferedInputStream inputImage = new BufferedInputStream(inp);
 		BufferedOutputStream outputImage = new BufferedOutputStream(oup);
@@ -80,7 +72,7 @@ public class FileCopier {
 	 * @param name The name of the method to be added to the database
 	 * @throws SQLException if the database or table doess not exist
 	 */
-	public void addImageToDatabase(String name) throws SQLException {
+	public static void addImageToDatabase(String name) throws SQLException {
 		Connection connection = DatabaseConnector.getConnection();
 		Statement stmt = connection.createStatement();
 		stmt.execute("INSERT INTO images (ImageName) VALUES (\""+ name + "\")");
@@ -91,7 +83,7 @@ public class FileCopier {
 	 * @param imageName Name of wallpaper
 	 * @return ID of wallpaper in the database. Returns -1 if no wallpaper exists with that name
 	 */
-	public int GetWallpaperID(String imageName) {
+	public static int GetWallpaperID(String imageName) {
 		//Creates reference to the connection to the SQL Database
 		Connection connection = DatabaseConnector.getConnection();
 		
@@ -110,5 +102,28 @@ public class FileCopier {
 		}
 		//Returns -1 if no wallpaper could be found with that name
 		return -1;
+	}
+	
+	public static String GetWallpaperName(int wallpaperID) {
+		// Creates reference to the connection to the SQL Database
+		Connection connection = DatabaseConnector.getConnection();
+
+		try {
+			// Initializes a statement that will be used to run a query in the database
+			Statement stmt = connection.createStatement();
+
+			String query = String.format("SELECT ImageName FROM images WHERE ImageID = %d", wallpaperID);
+			ResultSet results = stmt.executeQuery(query);
+			
+			while(results.next()) return results.getString("ImageName");
+		} catch (SQLException e) {
+			System.out.println("Database connection could not be established");
+		}
+		// Returns -1 if no wallpaper could be found with that name
+		return "Non Existent";
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(GetWallpaperName(4));
 	}
 }
