@@ -86,23 +86,29 @@ public class FileCopier {
 		stmt.execute("INSERT INTO images (ImageName) VALUES (\""+ name + "\")");
 	}
 	
-	public static void main(String[] args) {
-		//Instantiates a file copier object that copies an image to the output location
-		FileCopier fc = new FileCopier("src/Wallpapers");
+	/**
+	 * This method finds the ID of a wallpaper in the database given the name. Returns -1 if no wallpaper could be found with the given name.
+	 * @param imageName Name of wallpaper
+	 * @return ID of wallpaper in the database. Returns -1 if no wallpaper exists with that name
+	 */
+	public int GetWallpaperID(String imageName) {
+		//Creates reference to the connection to the SQL Database
+		Connection connection = DatabaseConnector.getConnection();
 		
-
-		Scanner sc = new Scanner(System.in); System.out.
-		println("Please input the file location of the file you want to copy: ");
-		String outputLocation = sc.nextLine();
-
-		System.out.println("Please input the new name of the file: "); String
-		outputName = sc.nextLine();
-
-		try { fc.duplicateImage(outputLocation, outputName); } 
-		catch (IOException e) { return; }
-
-		System.out.println("COMPLETE");
-		 
-		
+		try {
+			//Initializes a statement that will be used to run a query in the database
+			Statement stmt = connection.createStatement();
+			
+			//Queries the database and returns a data set containing the image id for of the wallpaper with the name
+			String query = String.format("SELECT ImageID FROM images WHERE ImageName = '%s'", imageName);
+			ResultSet results = stmt.executeQuery(query);
+			
+			//returns the wallpaper ID
+			while(results.next()) return results.getInt("ImageID");
+		} catch (SQLException e) {
+			System.out.println("Database connection could not be established");
+		}
+		//Returns -1 if no wallpaper could be found with that name
+		return -1;
 	}
 }

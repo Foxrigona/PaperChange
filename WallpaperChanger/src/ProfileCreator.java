@@ -14,8 +14,6 @@ import javax.xml.crypto.Data;
  * This utility class is used to create profiles that link image wallpapers together and allow you to switch between them.
  */
 public final class ProfileCreator {
-	//The active profile
-	private static int activeProfile;
 	
 	private ProfileCreator() {
 		
@@ -115,12 +113,33 @@ public final class ProfileCreator {
 		}
 	}
 	
+	/**
+	 * Return the ID of the profile given the name
+	 * @param profileName The name of the profile
+	 * @return The ID of the profile. Returns -1 if the profile does not exist.
+	 */
 	public static int getProfileID(String profileName) {
+		//References the connection to the database
 		Connection c = DatabaseConnector.getConnection();
-		return 1;
+		
+		try {
+			//Creates the statement that will be executed
+			Statement request = c.createStatement();
+			
+			//Queries the database for the ID of the profile with the given name and stores it in a result set
+			String query = String.format("SELECT ProfileID FROM imgprofiles WHERE ProfileName = '%s'", profileName);			
+			ResultSet result = request.executeQuery(query);	
+			
+			//Returns the profile ID
+			while(result.next()) return result.getInt("ProfileID");
+		} catch (SQLException e) {
+			System.out.println("Database could not be found");
+		}
+		//Returns -1 if no profile with that name exists in the database
+		return -1;
 	}
 	
 	public static void main(String[] args) {
-		ProfileCreator.setActiveProfile(1, 3);
+		System.out.println(ProfileCreator.getProfileID("ArcanCharacters"));
 	}
 }
