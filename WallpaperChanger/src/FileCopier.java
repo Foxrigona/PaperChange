@@ -123,7 +123,7 @@ public class FileCopier {
 		return "Non Existent";
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(GetWallpaperName(4));
+	public static void main(String[] args) throws IOException {
+		FileCopier.duplicateImage("C:\\Users\\ethan\\Downloads\\1070888.jpg", "Laeus");
 	}
 }

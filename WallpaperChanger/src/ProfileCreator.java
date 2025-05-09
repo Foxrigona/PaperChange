@@ -158,7 +158,8 @@ public final class ProfileCreator {
 		return -1;
 	}
 	
-	public static void main(String[] args) {
-		setActiveProfile(4, 4);
+	public static void main(String[] args) throws SQLException {
+		MakeProfile("MonsterNormal", "Gyutaro", "Laeus");
+		setActiveProfile(7, 4);
 	}
 }
